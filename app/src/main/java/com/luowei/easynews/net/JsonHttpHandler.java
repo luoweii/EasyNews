@@ -1,8 +1,8 @@
 package com.luowei.easynews.net;
 
-import com.karakal.musicalarm.utils.JsonUtil;
-import com.karakal.musicalarm.utils.LogUtil;
 import com.loopj.android.http.TextHttpResponseHandler;
+import com.luowei.easynews.utils.JsonUtil;
+import com.luowei.easynews.utils.LogUtil;
 
 import org.json.JSONObject;
 
@@ -15,6 +15,7 @@ import cz.msebera.android.httpclient.Header;
  * Created by luowei on 2015/10/25.
  */
 public abstract class JsonHttpHandler<T> extends TextHttpResponseHandler {
+    private static int CACHE_CODE = 304;//缓存代码
     private boolean enableCache;
 
     public JsonHttpHandler() {
@@ -26,26 +27,15 @@ public abstract class JsonHttpHandler<T> extends TextHttpResponseHandler {
 
     @Override
     public void onSuccess(int statusCode, Header[] headers, String responseString) {
-        LogUtil.d("----------MHttp response " + (statusCode == -2 ? "cache" : "")
+        LogUtil.d("----------MHttp response " + (statusCode == CACHE_CODE ? "cache" : "")
                 + "(" + getRequestURI() + ")-------------\n" + responseString);
         try {
             if (enableCache && getTag() != null) {
                 String tag = getTag().toString();
                 AHttp.httpCache.put(tag, responseString);
             }
-
-            JSONObject jo = new JSONObject(responseString);
-            int code = jo.getInt(AHttp.RESPONSE_CODE);
-            switch (code) {
-                case 0:
-                    String str = jo.getString(AHttp.RESPONSE_DATA);
-                    T data = processResult(str);
-                    onSuccess(data);
-                    break;
-                default:
-                    onFailure(code, jo.getString(AHttp.RESPONSE_MSG));
-                    break;
-            }
+            T data = processResult(responseString);
+            onSuccess(data);
         } catch (Exception e) {
             LogUtil.w(e);
             onFailure(-1, "数据格式错误");
@@ -66,7 +56,7 @@ public abstract class JsonHttpHandler<T> extends TextHttpResponseHandler {
         LogUtil.w(statusCode + " " + responseString, throwable);
         if (enableCache && getTag() != null) {
             String result = AHttp.httpCache.get(getTag().toString());
-            if (result != null) onSuccess(-2, null, result);
+            if (result != null) onSuccess(CACHE_CODE, null, result);
             else onFailure(statusCode, responseString);
         } else {
             onFailure(statusCode, responseString);

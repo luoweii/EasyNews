@@ -11,9 +11,6 @@ import com.luowei.easynews.utils.LogUtil;
  * Created by 骆巍 on 2016/2/14.
  */
 public class AHttp {
-    public static final String RESPONSE_CODE = "state";
-    public static final String RESPONSE_MSG = "message";
-    public static final String RESPONSE_DATA = "data";
     public static HttpCache httpCache = new HttpCache();
     private static AsyncHttpClient client = new AsyncHttpClient();
 
