@@ -62,7 +62,7 @@ public class App extends Application {
         DisplayImageOptions options = new DisplayImageOptions.Builder().cacheInMemory(true)
                 .cacheOnDisk(true)
                 .considerExifParams(true)
-                .displayer(new FadeInBitmapDisplayer(200))
+                .displayer(new FadeInBitmapDisplayer(300))
                 .resetViewBeforeLoading(true)
                 .bitmapConfig(Bitmap.Config.RGB_565).imageScaleType(ImageScaleType.EXACTLY)
 //                .showImageOnFail(R.drawable.ic_default_ring)

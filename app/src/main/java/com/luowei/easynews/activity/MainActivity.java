@@ -2,6 +2,7 @@ package com.luowei.easynews.activity;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -16,12 +17,20 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.loopj.android.http.RequestParams;
+import com.luowei.easynews.Constant;
 import com.luowei.easynews.R;
+import com.luowei.easynews.adapter.NewsAdapter;
+import com.luowei.easynews.entity.News;
+import com.luowei.easynews.net.AHttp;
+import com.luowei.easynews.net.JsonHttpHandler;
 import com.luowei.easynews.utils.Blur;
 import com.luowei.easynews.utils.CommonUtil;
 import com.luowei.easynews.utils.ViewHelper;
@@ -35,6 +44,10 @@ import com.umeng.socialize.bean.SHARE_MEDIA;
 import java.util.Map;
 
 import butterknife.Bind;
+import in.srain.cube.views.ptr.PtrDefaultHandler;
+import in.srain.cube.views.ptr.PtrFrameLayout;
+import in.srain.cube.views.ptr.PtrHandler;
+import in.srain.cube.views.ptr.header.StoreHouseHeader;
 
 /**
  * 主导航界面
@@ -47,6 +60,12 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     TextView tvName;
     @Bind(R.id.nav_view)
     NavigationView navigationView;
+    @Bind(R.id.listView)
+    ListView listView;
+    private NewsAdapter newsAdapter;
+    @Bind(R.id.ptrFrameLayout)
+    PtrFrameLayout ptrFrameLayout;
+    private int currentPage = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +109,53 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         ivHead = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.ivHead);
         llLogin = (LinearLayout) navigationView.getHeaderView(0).findViewById(R.id.llLogin);
         tvName = (TextView) navigationView.getHeaderView(0).findViewById(R.id.tvName);
+
+        newsAdapter = new NewsAdapter();
+        listView.setAdapter(newsAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                WebActivity.startActivity(MainActivity.this, newsAdapter.getItem(position).link);
+            }
+        });
+
+        StoreHouseHeader header = new StoreHouseHeader(this);
+        header.setTextColor(Color.RED);
+        header.setPadding(0, CommonUtil.dp2px(12), 0, CommonUtil.dp2px(12));
+        header.initWithString("luo wei");
+        ptrFrameLayout.setDurationToCloseHeader(500);
+        ptrFrameLayout.setHeaderView(header);
+        ptrFrameLayout.addPtrUIHandler(header);
+        ptrFrameLayout.setPtrHandler(new PtrHandler() {
+            @Override
+            public boolean checkCanDoRefresh(PtrFrameLayout frame, View content, View header) {
+                return PtrDefaultHandler.checkContentCanBePulledDown(frame, content, header);
+            }
+
+            @Override
+            public void onRefreshBegin(PtrFrameLayout frame) {
+                getData();
+            }
+        });
+        ptrFrameLayout.autoRefresh();
+    }
+
+    private void getData() {
+        RequestParams rp = new RequestParams();
+        rp.add("page", (currentPage++) + "");
+        AHttp.get(Constant.HTTP_CHANNEL_NEWS, rp, new JsonHttpHandler<News.NewsResponse>() {
+            @Override
+            public void onSuccess(News.NewsResponse data) {
+                newsAdapter.addData(0,data.showapi_res_body.pagebean.contentlist);
+                ptrFrameLayout.refreshComplete();
+            }
+
+            @Override
+            public void onFailure(int errCode, String msg) {
+                CommonUtil.showToast(errCode + ": " + msg);
+                ptrFrameLayout.refreshComplete();
+            }
+        });
     }
 
     @Override
@@ -186,7 +252,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
                             @Override
                             public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                                Bitmap bm = Blur.fastblur(loadedImage, CommonUtil.dp2px(view.getContext(), 10), 0.1f);
+                                Bitmap bm = Blur.fastblur(loadedImage, CommonUtil.dp2px(10), 0.1f);
                                 View vBackground = navigationView.getHeaderView(0).findViewById(R.id.vBackground);
                                 vBackground.setBackground(new BitmapDrawable(bm));
                                 ViewHelper.toggleViewAnim(vBackground);

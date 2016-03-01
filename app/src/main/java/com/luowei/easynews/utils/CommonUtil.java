@@ -33,13 +33,13 @@ public class CommonUtil {
         Toast.makeText(App.context, id, Toast.LENGTH_SHORT).show();
     }
 
-    public static int dp2px(Context context, float dipValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
+    public static int dp2px(float dipValue) {
+        final float scale = App.context.getResources().getDisplayMetrics().density;
         return (int) (dipValue * scale + 0.5f);
     }
 
-    public static float px2dp(Context context, float pxValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
+    public static float px2dp( float pxValue) {
+        final float scale = App.context.getResources().getDisplayMetrics().density;
         return (pxValue / scale + 0.5f);
     }
 

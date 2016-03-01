@@ -19,18 +19,18 @@ public class AHttp {
     }
 
     public static void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
-        url = getAbsoluteUrl(url);
         LogUtil.d("-------------AHttp(get url)--------------- \n" + url
                 + "\n-----    " + params);
         responseHandler.setTag(CommonUtil.getMD5(url + params));
+        client.addHeader(Constant.API_KEY, Constant.API_KEY_VALUE);
         client.get(url, params, responseHandler);
     }
 
     public static void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
-        url = getAbsoluteUrl(url);
         LogUtil.d("-------------AHttp(post url)--------------- \n" + url
                 + "\n-----    " + params);
         responseHandler.setTag(CommonUtil.getMD5(url + params));
+        client.addHeader(Constant.API_KEY, Constant.API_KEY_VALUE);
         client.post(url, params, responseHandler);
     }
 

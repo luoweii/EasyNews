@@ -35,6 +35,8 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".activity.WebActivity" />
+
         <!--==========友盟相关=========-->
         <activity
             android:name="com.umeng.socialize.editorpage.ShareActivity"
