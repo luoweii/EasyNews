@@ -28,6 +28,7 @@ android {
         debug {
 //            applicationIdSuffix '.d'
             manifestPlaceholders = [app_label: "@string/app_name_debug"]
+            signingConfig signingConfigs.luowei
         }
     }
 }
@@ -44,4 +45,5 @@ dependencies {
     compile 'com.loopj.android:android-async-http:1.4.9'
     compile 'com.jakewharton:disklrucache:2.0.2'
     compile project(':sociallib')
+    compile 'de.hdodenhof:circleimageview:2.0.0'
 }

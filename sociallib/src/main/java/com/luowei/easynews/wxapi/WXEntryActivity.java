@@ -1,4 +1,4 @@
-package com.luowei.sociallib.wxapi;
+package com.luowei.easynews.wxapi;
 
 
 import com.umeng.socialize.weixin.view.WXCallbackActivity;

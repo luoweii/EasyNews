@@ -84,11 +84,11 @@ public class App extends Application {
      */
     private void initSocial() {
         //微信 appid appsecret
-        PlatformConfig.setWeixin("wx967daebe835fbeac", "5bb696d9ccd75a38c8a0bfe0675559b3");
+        PlatformConfig.setWeixin("wxf9e7bbf104b7569f", "03934be29c61f4cf91c61c8f55905681");
         //新浪微博 appkey appsecret
-        PlatformConfig.setSinaWeibo("3921700954","04b48b094faeb16683c32669824ebdad");
+        PlatformConfig.setSinaWeibo("2486276020","50c969a4d1c4d3dbc2c0df9c6534be98");
         // QQ和Qzone appid appkey
-        PlatformConfig.setQQZone("100424468", "c7394704798a158208a74ab60104f0ba");
+        PlatformConfig.setQQZone("1105141321", "519fkkub6vbPiVti");
         //支付宝 appid
         PlatformConfig.setAlipay("2015111700822536");
     }

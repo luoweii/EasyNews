@@ -1,9 +1,14 @@
 package com.luowei.easynews.activity;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -11,14 +16,37 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.luowei.easynews.R;
+import com.luowei.easynews.utils.Blur;
+import com.luowei.easynews.utils.CommonUtil;
+import com.luowei.easynews.utils.ViewHelper;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
+import com.umeng.socialize.UMAuthListener;
+import com.umeng.socialize.UMShareAPI;
+import com.umeng.socialize.bean.SHARE_MEDIA;
+
+import java.util.Map;
+
+import butterknife.Bind;
 
 /**
  * 主导航界面
  * Created by 骆巍 on 2016/2/26.
  */
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
+    private UMShareAPI umShareAPI;
+    ImageView ivHead;
+    LinearLayout llLogin;
+    TextView tvName;
+    @Bind(R.id.nav_view)
+    NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +86,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         });
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        ivHead = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.ivHead);
+        llLogin = (LinearLayout) navigationView.getHeaderView(0).findViewById(R.id.llLogin);
+        tvName = (TextView) navigationView.getHeaderView(0).findViewById(R.id.tvName);
     }
 
     @Override
@@ -115,5 +147,88 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.END);
         return true;
+    }
+
+    public void loginOnClick(View view) {
+        umShareAPI = UMShareAPI.get(this);
+        SHARE_MEDIA platform = null;
+        switch (view.getId()) {
+            case R.id.ivSina:
+                platform = SHARE_MEDIA.SINA;
+                break;
+            case R.id.ivWeixin:
+                platform = SHARE_MEDIA.WEIXIN;
+                break;
+            case R.id.ivQQ:
+                platform = SHARE_MEDIA.QQ;
+                break;
+        }
+        final SHARE_MEDIA finalPlatform = platform;
+        umShareAPI.doOauthVerify(this, platform, new UMAuthListener() {
+            @Override
+            public void onComplete(SHARE_MEDIA share_media, int i, Map<String, String> map) {
+                Toast.makeText(getApplicationContext(), "登录成功", Toast.LENGTH_SHORT).show();
+                umShareAPI.getPlatformInfo(MainActivity.this, finalPlatform, new UMAuthListener() {
+                    @Override
+                    public void onComplete(SHARE_MEDIA share_media, int i, Map<String, String> map) {
+                        String headUrl = map.get("profile_image_url");
+                        String name = map.get("screen_name");
+                        ImageLoader.getInstance().displayImage(headUrl, ivHead, new ImageLoadingListener() {
+                            @Override
+                            public void onLoadingStarted(String imageUri, View view) {
+
+                            }
+
+                            @Override
+                            public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+
+                            }
+
+                            @Override
+                            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                                Bitmap bm = Blur.fastblur(loadedImage, CommonUtil.dp2px(view.getContext(), 10), 0.1f);
+                                View vBackground = navigationView.getHeaderView(0).findViewById(R.id.vBackground);
+                                vBackground.setBackground(new BitmapDrawable(bm));
+                                ViewHelper.toggleViewAnim(vBackground);
+                            }
+
+                            @Override
+                            public void onLoadingCancelled(String imageUri, View view) {
+
+                            }
+                        });
+                        tvName.setText(name);
+                        ViewHelper.toggleViewAnim(ivHead);
+                        ViewHelper.toggleViewAnim(llLogin);
+                    }
+
+                    @Override
+                    public void onError(SHARE_MEDIA share_media, int i, Throwable throwable) {
+
+                    }
+
+                    @Override
+                    public void onCancel(SHARE_MEDIA share_media, int i) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onError(SHARE_MEDIA share_media, int i, Throwable throwable) {
+                Toast.makeText(getApplicationContext(), "Authorize fail", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancel(SHARE_MEDIA share_media, int i) {
+                Toast.makeText(getApplicationContext(), "Authorize cancel", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        umShareAPI.onActivityResult(requestCode, resultCode, data);
     }
 }

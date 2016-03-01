@@ -43,7 +43,7 @@
 
         <!--微信平台-->
         <activity
-            android:name="com.luowei.sociallib.wxapi.WXEntryActivity"
+            android:name="com.luowei.easynews.wxapi.WXEntryActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:screenOrientation="portrait"
@@ -77,7 +77,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="tencent100424468" />
+                <data android:scheme="tencent1105141321" />
             </intent-filter>
         </activity>
         <activity
