@@ -34,27 +34,37 @@ public class NewsAdapter extends BaseAdapter<News> {
         if (news.imageurls.size() > 1) {
             ivImage.setVisibility(View.GONE);
             llImages.setVisibility(View.VISIBLE);
-            llImages.removeAllViews();
-            for (int i = 0; i < news.imageurls.size(); i++) {
-                ImageView iv = new ImageView(parent.getContext());
-                iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, CommonUtil.dp2px(80), 1);
-                int margin = CommonUtil.dp2px(1);
-                lp.setMargins(margin, margin, margin, margin);
-                llImages.addView(iv, lp);
-                ImageLoader.getInstance().displayImage(news.imageurls.get(i).url, iv);
-                if (i == 4) break;
+            if (!news.imageurls.equals(llImages.getTag())) {
+                llImages.setTag(news.imageurls);
+                llImages.removeAllViews();
+                for (int i = 0; i < news.imageurls.size(); i++) {
+                    ImageView iv = new ImageView(parent.getContext());
+                    iv.setBackgroundColor(0xffe8e8e8);
+                    iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, CommonUtil.dp2px(80), 1);
+                    int margin = CommonUtil.dp2px(1);
+                    lp.setMargins(margin, margin, margin, margin);
+                    llImages.addView(iv, lp);
+                    loadImage(news.imageurls.get(i).url, iv);
+                    if (i == 4) break;
+                }
             }
         } else if (news.imageurls.size() == 1) {
             ivImage.setVisibility(View.VISIBLE);
             llImages.setVisibility(View.GONE);
-            ImageLoader.getInstance().displayImage(news.imageurls.get(0).url, ivImage);
+            loadImage(news.imageurls.get(0).url, ivImage);
         } else {
             ivImage.setVisibility(View.GONE);
             llImages.setVisibility(View.GONE);
         }
         tvTitle.setText(news.title);
-        tvSource.setText(news.source+"  "+news.getFormatDate());
+        tvSource.setText(news.source + "  " + news.getFormatDate());
         return convertView;
+    }
+
+    private void loadImage(String url, ImageView iv) {
+        if (!url.equals(iv.getTag()))
+            ImageLoader.getInstance().displayImage(url, iv);
+        iv.setTag(url);
     }
 }

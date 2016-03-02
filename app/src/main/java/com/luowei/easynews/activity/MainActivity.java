@@ -3,13 +3,11 @@ package com.luowei.easynews.activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -17,6 +15,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -65,7 +64,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private NewsAdapter newsAdapter;
     @Bind(R.id.ptrFrameLayout)
     PtrFrameLayout ptrFrameLayout;
-    private int currentPage = 1;
+    private int currentPage = 0;
+    private View vLoadmore;
+    private boolean isLoading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +85,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         });
 
         final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+        final ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
@@ -115,7 +116,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                WebActivity.startActivity(MainActivity.this, newsAdapter.getItem(position).link);
+                if (id < 0) return;
+                WebActivity.startActivity(MainActivity.this, newsAdapter.getItem((int) id).link);
             }
         });
 
@@ -134,26 +136,51 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
             @Override
             public void onRefreshBegin(PtrFrameLayout frame) {
-                getData();
+                getData(true);
             }
         });
         ptrFrameLayout.autoRefresh();
+        vLoadmore = getLayoutInflater().inflate(R.layout.list_footer_load_more, null);
+        listView.addFooterView(vLoadmore);
+
+        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                // 如果滑动到最后一项
+                if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE
+                        && view.getLastVisiblePosition() == view.getCount() - 1 && listView.getFooterViewsCount() > 0) {
+                    if (!isLoading) {
+                        getData(false);
+                    }
+                }
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+            }
+        });
     }
 
-    private void getData() {
+    private void getData(final boolean isStart) {
+        isLoading = true;
+        if (isStart) currentPage = 0;
         RequestParams rp = new RequestParams();
-        rp.add("page", (currentPage++) + "");
+        rp.add("page", (++currentPage) + "");
         AHttp.get(Constant.HTTP_CHANNEL_NEWS, rp, new JsonHttpHandler<News.NewsResponse>() {
             @Override
             public void onSuccess(News.NewsResponse data) {
-                newsAdapter.addData(0,data.showapi_res_body.pagebean.contentlist);
+                if (isStart) newsAdapter.setData(data.showapi_res_body.pagebean.contentlist);
+                else newsAdapter.addData(data.showapi_res_body.pagebean.contentlist);
                 ptrFrameLayout.refreshComplete();
+                isLoading = false;
             }
 
             @Override
             public void onFailure(int errCode, String msg) {
                 CommonUtil.showToast(errCode + ": " + msg);
                 ptrFrameLayout.refreshComplete();
+                isLoading = false;
             }
         });
     }
