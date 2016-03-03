@@ -1,5 +1,7 @@
 package com.luowei.easynews.adapter;
 
+import android.text.Html;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +21,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
  */
 public class NewsAdapter extends BaseAdapter<News> {
     private LayoutInflater inflater;
+    private String query;
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -32,6 +35,7 @@ public class NewsAdapter extends BaseAdapter<News> {
         TextView tvSource = ViewHelper.get(convertView, R.id.tvSource);
         LinearLayout llImages = ViewHelper.get(convertView, R.id.llImages);
         if (news.imageurls.size() > 1) {
+            ImageLoader.getInstance().cancelDisplayTask(ivImage);
             ivImage.setVisibility(View.GONE);
             llImages.setVisibility(View.VISIBLE);
             if (!news.imageurls.equals(llImages.getTag())) {
@@ -50,14 +54,24 @@ public class NewsAdapter extends BaseAdapter<News> {
                 }
             }
         } else if (news.imageurls.size() == 1) {
+            for (int i = 0; i < llImages.getChildCount(); i++) {
+                ImageLoader.getInstance().cancelDisplayTask((ImageView) llImages.getChildAt(i));
+            }
             ivImage.setVisibility(View.VISIBLE);
             llImages.setVisibility(View.GONE);
             loadImage(news.imageurls.get(0).url, ivImage);
         } else {
+            ImageLoader.getInstance().cancelDisplayTask(ivImage);
             ivImage.setVisibility(View.GONE);
+            for (int i = 0; i < llImages.getChildCount(); i++) {
+                ImageLoader.getInstance().cancelDisplayTask((ImageView) llImages.getChildAt(i));
+            }
             llImages.setVisibility(View.GONE);
         }
-        tvTitle.setText(news.title);
+        if (news.isRead) tvTitle.setTextColor(0xff888888);
+        else tvTitle.setTextColor(0xff333333);
+        if (TextUtils.isEmpty(query)) tvTitle.setText(news.title);
+        else setColorString(tvTitle, news.title, query);
         tvSource.setText(news.source + "  " + news.getFormatDate());
         return convertView;
     }
@@ -66,5 +80,21 @@ public class NewsAdapter extends BaseAdapter<News> {
         if (!url.equals(iv.getTag()))
             ImageLoader.getInstance().displayImage(url, iv);
         iv.setTag(url);
+    }
+
+    public void setQuery(String query) {
+        this.query = query;
+    }
+
+    private void setColorString(TextView tv, String source, String key) {
+        tv.setText("");
+        int i = -1;
+        while ((i = source.indexOf(key)) > -1) {
+            String s = source.substring(0, i);
+            tv.append(s);
+            tv.append(Html.fromHtml("<font color='#FF4081'>" + key + "</font>"));
+            source = source.substring(i + key.length());
+        }
+        tv.append(source);
     }
 }

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.SearchView;
 
 import com.luowei.easynews.R;
 
@@ -22,6 +23,8 @@ public class WebActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);// 显示返回按钮
+
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setAppCacheEnabled(true);
         webView.setWebViewClient(new WebViewClient() {

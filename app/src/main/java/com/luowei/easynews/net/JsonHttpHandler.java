@@ -4,6 +4,7 @@ import com.loopj.android.http.TextHttpResponseHandler;
 import com.luowei.easynews.utils.JsonUtil;
 import com.luowei.easynews.utils.LogUtil;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.ParameterizedType;
@@ -38,7 +39,7 @@ public abstract class JsonHttpHandler<T> extends TextHttpResponseHandler {
             onSuccess(data);
         } catch (Exception e) {
             LogUtil.w(e);
-            onFailure(-1, "数据格式错误");
+            onFailure(-1,responseString);
         }
     }
 

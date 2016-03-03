@@ -21,7 +21,9 @@ public class News extends BaseEntity {
     public String pubDate;
     public String source;
     public String title;
+
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public boolean isRead;
 
     public String getFormatDate() {
         if (TextUtils.isEmpty(pubDate)) return "";
