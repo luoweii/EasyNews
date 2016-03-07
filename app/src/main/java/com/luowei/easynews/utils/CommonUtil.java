@@ -5,9 +5,11 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
+import android.text.Html;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -201,5 +203,23 @@ public class CommonUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * 高亮指定文字
+     * @param tv
+     * @param source
+     * @param key
+     */
+    public static void highlightString(TextView tv, String source, String key) {
+        tv.setText("");
+        int i = -1;
+        while ((i = source.indexOf(key)) > -1) {
+            String s = source.substring(0, i);
+            tv.append(s);
+            tv.append(Html.fromHtml("<font color='#FF4081'>" + key + "</font>"));
+            source = source.substring(i + key.length());
+        }
+        tv.append(source);
     }
 }

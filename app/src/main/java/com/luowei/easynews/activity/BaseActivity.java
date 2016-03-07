@@ -92,6 +92,6 @@ public class BaseActivity extends AppCompatActivity {
 
     @Subscribe
     public void onEvent(String msg){
-        CommonUtil.showToast(msg);
+        CommonUtil.showToast(msg+" "+toString());
     }
 }

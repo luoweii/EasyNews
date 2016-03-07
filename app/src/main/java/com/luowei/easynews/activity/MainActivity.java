@@ -30,6 +30,9 @@ import com.luowei.easynews.Constant;
 import com.luowei.easynews.R;
 import com.luowei.easynews.adapter.NewsAdapter;
 import com.luowei.easynews.entity.News;
+import com.luowei.easynews.fragment.BaseFragment;
+import com.luowei.easynews.fragment.NewsFragment;
+import com.luowei.easynews.fragment.WeixinFragment;
 import com.luowei.easynews.net.AHttp;
 import com.luowei.easynews.net.JsonHttpHandler;
 import com.luowei.easynews.utils.Blur;
@@ -62,16 +65,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     TextView tvName;
     @Bind(R.id.nav_view)
     NavigationView navigationView;
-    @Bind(R.id.listView)
-    ListView listView;
-    private NewsAdapter newsAdapter;
-    @Bind(R.id.ptrFrameLayout)
-    PtrClassicFrameLayout ptrFrameLayout;
-    private int currentPage = 0;
-    private View vLoadmore;
-    private boolean isLoading;
     private SearchView searchView;
-    private String query;//查询字段
+    public static String query;//查询字段
+    private BaseFragment fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,88 +112,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         llLogin = (LinearLayout) navigationView.getHeaderView(0).findViewById(R.id.llLogin);
         tvName = (TextView) navigationView.getHeaderView(0).findViewById(R.id.tvName);
 
-        newsAdapter = new NewsAdapter();
-        listView.setAdapter(newsAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (id < 0) return;
-                WebActivity.startActivity(MainActivity.this, newsAdapter.getItem((int) id).link);
-                newsAdapter.getItem((int) id).isRead = true;
-                newsAdapter.notifyDataSetChanged();
-            }
-        });
-
-        ptrFrameLayout.setDurationToCloseHeader(500);
-        ptrFrameLayout.setLastUpdateTimeRelateObject(this);
-        ptrFrameLayout.setPtrHandler(new PtrHandler() {
-            @Override
-            public boolean checkCanDoRefresh(PtrFrameLayout frame, View content, View header) {
-                return PtrDefaultHandler.checkContentCanBePulledDown(frame, content, header);
-            }
-
-            @Override
-            public void onRefreshBegin(PtrFrameLayout frame) {
-                getData(true);
-            }
-        });
-        vLoadmore = getLayoutInflater().inflate(R.layout.list_footer_load_more, null);
-
-        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
-                // 如果滑动到最后一项
-                if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE
-                        && view.getLastVisiblePosition() == view.getCount() - 1 && listView.getFooterViewsCount() > 0) {
-                    if (!isLoading) {
-                        getData(false);
-                    }
-                }
-                if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL && !searchView.isIconified()) {
-                    CommonUtil.hideInput(MainActivity.this);
-                }
-            }
-
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-
-            }
-        });
-        ptrFrameLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                ptrFrameLayout.autoRefresh();
-            }
-        });
-    }
-
-    private void getData(final boolean isStart) {
-        isLoading = true;
-        if (isStart) currentPage = 0;
-        RequestParams rp = new RequestParams();
-        rp.add("page", (++currentPage) + "");
-        if (!TextUtils.isEmpty(query)) rp.add("title", query);
-        AHttp.get(Constant.HTTP_CHANNEL_NEWS, rp, new JsonHttpHandler<News.NewsResponse>() {
-            @Override
-            public void onSuccess(News.NewsResponse data) {
-                if (isStart) newsAdapter.setData(data.showapi_res_body.pagebean.contentlist);
-                else newsAdapter.addData(data.showapi_res_body.pagebean.contentlist);
-                ptrFrameLayout.refreshComplete();
-                isLoading = false;
-                if (data.showapi_res_body.pagebean.currentPage >= data.showapi_res_body.pagebean.allPages) {
-                    listView.removeFooterView(vLoadmore);
-                } else if (listView.getFooterViewsCount() == 0) {
-                    listView.addFooterView(vLoadmore);
-                }
-            }
-
-            @Override
-            public void onFailure(int errCode, String msg) {
-                CommonUtil.showToast(errCode + ": " + msg);
-                ptrFrameLayout.refreshComplete();
-                isLoading = false;
-            }
-        });
+        fragment = new NewsFragment();
+        replaceFragment(fragment);
     }
 
     @Override
@@ -219,8 +135,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                setQuery(query);
-                ptrFrameLayout.autoRefresh();
+                MainActivity.query = query;
+                eventBus.post(fragment);
                 return false;
             }
 
@@ -232,8 +148,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         searchView.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
             public boolean onClose() {
-                setQuery(null);
-                ptrFrameLayout.autoRefresh();
+                MainActivity.query = null;
+                eventBus.post(fragment);
                 return false;
             }
         });
@@ -264,9 +180,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            // Handle the camera action
+            fragment = new NewsFragment();
+            replaceFragment(fragment);
         } else if (id == R.id.nav_gallery) {
-
+            fragment = new WeixinFragment();
+            replaceFragment(fragment);
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
@@ -365,8 +283,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         umShareAPI.onActivityResult(requestCode, resultCode, data);
     }
 
-    public void setQuery(String q) {
-        query = q;
-        newsAdapter.setQuery(q);
+    public SearchView getSearchView() {
+        return searchView;
+    }
+
+    public void replaceFragment(BaseFragment fragment) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.mainFragment, fragment).commit();
     }
 }

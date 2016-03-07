@@ -7,10 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.luowei.easynews.R;
+import com.luowei.easynews.activity.MainActivity;
 import com.luowei.easynews.entity.News;
 import com.luowei.easynews.utils.CommonUtil;
 import com.luowei.easynews.utils.ViewHelper;
@@ -21,7 +21,6 @@ import com.nostra13.universalimageloader.core.ImageLoader;
  */
 public class NewsAdapter extends BaseAdapter<News> {
     private LayoutInflater inflater;
-    private String query;
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -70,8 +69,8 @@ public class NewsAdapter extends BaseAdapter<News> {
         }
         if (news.isRead) tvTitle.setTextColor(0xff888888);
         else tvTitle.setTextColor(0xff333333);
-        if (TextUtils.isEmpty(query)) tvTitle.setText(news.title);
-        else setColorString(tvTitle, news.title, query);
+        if (TextUtils.isEmpty(MainActivity.query)) tvTitle.setText(news.title);
+        else CommonUtil.highlightString(tvTitle, news.title, MainActivity.query);
         tvSource.setText(news.source + "  " + news.getFormatDate());
         return convertView;
     }
@@ -80,21 +79,5 @@ public class NewsAdapter extends BaseAdapter<News> {
         if (!url.equals(iv.getTag()))
             ImageLoader.getInstance().displayImage(url, iv);
         iv.setTag(url);
-    }
-
-    public void setQuery(String query) {
-        this.query = query;
-    }
-
-    private void setColorString(TextView tv, String source, String key) {
-        tv.setText("");
-        int i = -1;
-        while ((i = source.indexOf(key)) > -1) {
-            String s = source.substring(0, i);
-            tv.append(s);
-            tv.append(Html.fromHtml("<font color='#FF4081'>" + key + "</font>"));
-            source = source.substring(i + key.length());
-        }
-        tv.append(source);
     }
 }

@@ -75,6 +75,6 @@ public abstract class BaseFragment extends Fragment {
 
     @Subscribe
     public void onEvent(String msg){
-        CommonUtil.showToast(msg);
+        CommonUtil.showToast(msg+" "+toString());
     }
 }

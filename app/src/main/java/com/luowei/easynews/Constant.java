@@ -19,4 +19,9 @@ public class Constant {
      */
     public static final String HTTP_CHANNEL_NEWS = "http://apis.baidu.com/showapi_open_bus/channel_news/search_news";
 
+    /**
+     * 微信热门精选
+     */
+    public static final String HTTP_WEIXIN_HOT = "http://apis.baidu.com/txapi/weixin/wxhot";
+
 }

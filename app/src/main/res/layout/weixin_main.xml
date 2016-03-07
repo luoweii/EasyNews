@@ -1,26 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <in.srain.cube.views.ptr.PtrClassicFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/ptrFrameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     app:ptr_duration_to_close="300"
     app:ptr_duration_to_close_header="2000"
     app:ptr_keep_header_when_refresh="true"
     app:ptr_pull_to_fresh="false"
     app:ptr_ratio_of_header_height_to_refresh="1.2"
     app:ptr_resistance="1.7"
-    tools:context=".activity.MainActivity"
-    android:background="#eee"
-    tools:showIn="@layout/app_bar_main">
+    android:background="#eee">
 
     <ListView
         android:id="@+id/listView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?android:attr/windowBackground"
+        android:divider="@null"
+        android:dividerHeight="0dp"
         android:layoutAnimation="@anim/list_layout_anim">
 
     </ListView>
