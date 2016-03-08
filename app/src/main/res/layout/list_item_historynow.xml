@@ -24,7 +24,7 @@
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/tvDescription"
+                android:id="@+id/tvTime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
@@ -36,6 +36,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:scaleType="centerCrop" />
+
+            <TextView
+                android:id="@+id/tvDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:textColor="#555"
+                android:textSize="17sp" />
         </LinearLayout>
     </android.support.v7.widget.CardView>
 </LinearLayout>

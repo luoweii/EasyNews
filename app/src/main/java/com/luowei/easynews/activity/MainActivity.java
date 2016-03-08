@@ -31,6 +31,7 @@ import com.luowei.easynews.R;
 import com.luowei.easynews.adapter.NewsAdapter;
 import com.luowei.easynews.entity.News;
 import com.luowei.easynews.fragment.BaseFragment;
+import com.luowei.easynews.fragment.HistorynowFragment;
 import com.luowei.easynews.fragment.NewsFragment;
 import com.luowei.easynews.fragment.WeixinFragment;
 import com.luowei.easynews.net.AHttp;
@@ -112,7 +113,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         llLogin = (LinearLayout) navigationView.getHeaderView(0).findViewById(R.id.llLogin);
         tvName = (TextView) navigationView.getHeaderView(0).findViewById(R.id.tvName);
 
-        fragment = new NewsFragment();
+        fragment = NewsFragment.getInstance();
         replaceFragment(fragment);
     }
 
@@ -180,13 +181,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            fragment = new NewsFragment();
+            fragment = NewsFragment.getInstance();
             replaceFragment(fragment);
         } else if (id == R.id.nav_gallery) {
-            fragment = new WeixinFragment();
+            fragment = WeixinFragment.getInstance();
             replaceFragment(fragment);
         } else if (id == R.id.nav_slideshow) {
-
+            fragment = HistorynowFragment.getInstance();
+            replaceFragment(fragment);
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
@@ -288,6 +290,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     public void replaceFragment(BaseFragment fragment) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.mainFragment, fragment).commit();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.mainFragment, fragment).commit();
     }
 }

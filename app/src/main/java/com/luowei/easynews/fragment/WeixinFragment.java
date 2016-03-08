@@ -44,6 +44,13 @@ public class WeixinFragment extends BaseFragment {
     private MainActivity activity;
     private int pageNum = 20;
 
+    private static WeixinFragment fragment;
+
+    public static WeixinFragment getInstance() {
+        if (fragment == null)  fragment = new WeixinFragment();
+        return fragment;
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);

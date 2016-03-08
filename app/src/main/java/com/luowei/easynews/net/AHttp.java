@@ -16,13 +16,13 @@ public class AHttp {
 
     static {
         client.setTimeout(60000);
+        client.addHeader(Constant.API_KEY, Constant.API_KEY_VALUE);
     }
 
     public static void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
         LogUtil.d("-------------AHttp(get url)--------------- \n" + url
                 + "\n-----    " + params);
         responseHandler.setTag(CommonUtil.getMD5(url + params));
-        client.addHeader(Constant.API_KEY, Constant.API_KEY_VALUE);
         client.get(url, params, responseHandler);
     }
 
@@ -30,7 +30,6 @@ public class AHttp {
         LogUtil.d("-------------AHttp(post url)--------------- \n" + url
                 + "\n-----    " + params);
         responseHandler.setTag(CommonUtil.getMD5(url + params));
-        client.addHeader(Constant.API_KEY, Constant.API_KEY_VALUE);
         client.post(url, params, responseHandler);
     }
 
