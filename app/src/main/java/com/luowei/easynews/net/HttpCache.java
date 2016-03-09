@@ -20,7 +20,7 @@ public class HttpCache {
     private final Object mDiskCacheLock = new Object();
 
     private final int DISK_CACHE_INDEX = 0;
-    private int diskCacheSize = 1024 * 1024 * 50;  // 50M
+    private int diskCacheSize = 1024 * 1024 * 500;  // 50M
     private String diskCachePath;
 
     public HttpCache() {
@@ -58,8 +58,8 @@ public class HttpCache {
                     OutputStream outputStream = editor.newOutputStream(DISK_CACHE_INDEX);
                     byte[] buffer = new byte[4096];
                     int len = 0;
-                    BufferedInputStream bis = null;
-                    bis = new BufferedInputStream(new ByteArrayInputStream(result.getBytes("UTF-8")));
+                    BufferedInputStream bis = new BufferedInputStream(
+                            new ByteArrayInputStream(result.getBytes("UTF-8")));
                     BufferedOutputStream out = new BufferedOutputStream(outputStream);
                     while ((len = bis.read(buffer)) != -1) {
                         out.write(buffer, 0, len);
@@ -74,6 +74,32 @@ public class HttpCache {
         }
     }
 
+    public void put(String url, byte[] result) {
+        if (url == null || result == null) return;
+        if (mDiskLruCache == null) initDiskCache();
+        if (mDiskLruCache != null) {
+            try {
+                DiskLruCache.Editor editor = mDiskLruCache.edit(url);
+                if (editor != null) {
+                    OutputStream outputStream = editor.newOutputStream(DISK_CACHE_INDEX);
+                    byte[] buffer = new byte[4096];
+                    int len = 0;
+                    BufferedInputStream bis = new BufferedInputStream(new ByteArrayInputStream(result));
+                    BufferedOutputStream out = new BufferedOutputStream(outputStream);
+                    while ((len = bis.read(buffer)) != -1) {
+                        out.write(buffer, 0, len);
+                    }
+                    out.flush();
+                    out.close();
+                    editor.commit();
+                }
+            } catch (Throwable e) {
+                LogUtil.e(e.getMessage(), e);
+            }
+        }
+    }
+
+
     public String get(String url) {
         synchronized (mDiskCacheLock) {
             if (mDiskLruCache == null) initDiskCache();
@@ -82,8 +108,33 @@ public class HttpCache {
                 try {
                     snapshot = mDiskLruCache.get(url);
                     if (snapshot != null) {
-                        String result = getStringFromInputStream(snapshot.getInputStream(DISK_CACHE_INDEX));
-                        return result;
+                        return getStringFromInputStream(snapshot.getInputStream(DISK_CACHE_INDEX));
+                    }
+                } catch (Throwable e) {
+                    LogUtil.e(e.getMessage(), e);
+                } finally {
+                    closeQuietly(snapshot);
+                }
+            }
+        }
+        return null;
+    }
+
+    public byte[] getByte(String url) {
+        synchronized (mDiskCacheLock) {
+            if (mDiskLruCache == null) initDiskCache();
+            if (mDiskLruCache != null) {
+                DiskLruCache.Snapshot snapshot = null;
+                try {
+                    snapshot = mDiskLruCache.get(url);
+                    if (snapshot != null) {
+                        InputStream in = snapshot.getInputStream(DISK_CACHE_INDEX);
+                        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+                        byte[] data = new byte[4096];
+                        int count = -1;
+                        while ((count = in.read(data, 0, 4096)) != -1)
+                            outStream.write(data, 0, count);
+                        return outStream.toByteArray();
                     }
                 } catch (Throwable e) {
                     LogUtil.e(e.getMessage(), e);
@@ -108,7 +159,6 @@ public class HttpCache {
         int count = -1;
         while ((count = in.read(data, 0, 4096)) != -1)
             outStream.write(data, 0, count);
-
         data = null;
         return new String(outStream.toByteArray(), "UTF-8");
     }

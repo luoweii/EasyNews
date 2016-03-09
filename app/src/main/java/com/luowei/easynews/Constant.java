@@ -35,4 +35,21 @@ public class Constant {
      */
     public static final String HTTP_HISTORY_NOW = "http://api.juheapi.com/japi/toh";
 
+    /**
+     * 笑话大全
+     */
+    public static final String HTTP_JOKE_TEXT = "http://apis.baidu.com/showapi_open_bus/showapi_joke/joke_text";
+    /**
+     * 趣图
+     */
+    public static final String HTTP_JOKE_IMG = "http://apis.baidu.com/showapi_open_bus/showapi_joke/joke_pic";
+    /**
+     * 最新笑话大全
+     */
+    public static final String HTTP_JOKE_TEXT_JUHE = "http://japi.juhe.cn/joke/content/text.from";
+    /**
+     * 最新趣图
+     */
+    public static final String HTTP_JOKE_IMG_JUHE = "http://japi.juhe.cn/joke/img/text.from";
+
 }

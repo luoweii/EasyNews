@@ -32,6 +32,7 @@ import com.luowei.easynews.adapter.NewsAdapter;
 import com.luowei.easynews.entity.News;
 import com.luowei.easynews.fragment.BaseFragment;
 import com.luowei.easynews.fragment.HistorynowFragment;
+import com.luowei.easynews.fragment.JokeFragment;
 import com.luowei.easynews.fragment.NewsFragment;
 import com.luowei.easynews.fragment.WeixinFragment;
 import com.luowei.easynews.net.AHttp;
@@ -190,7 +191,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             fragment = HistorynowFragment.getInstance();
             replaceFragment(fragment);
         } else if (id == R.id.nav_manage) {
-
+            fragment = JokeFragment.getInstance();
+            replaceFragment(fragment);
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
