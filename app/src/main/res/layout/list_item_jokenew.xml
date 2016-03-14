@@ -39,7 +39,7 @@
                 <pl.droidsonroids.gif.GifTextureView
                     android:id="@+id/gifImage"
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
+                    android:layout_height="300dp"
                     android:scaleType="centerCrop"
                     app:freezesAnimation="true"
                     app:isOpaque="false" />
@@ -47,7 +47,7 @@
                 <ImageView
                     android:id="@+id/ivImage"
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
+                    android:layout_height="300dp"
                     android:scaleType="centerCrop" />
             </FrameLayout>
 
