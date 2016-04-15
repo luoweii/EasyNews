@@ -7,6 +7,7 @@ import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
 import android.text.Html;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
@@ -35,15 +36,24 @@ public class CommonUtil {
         Toast.makeText(App.context, id, Toast.LENGTH_SHORT).show();
     }
 
-    public static int dp2px(float dipValue) {
-        final float scale = App.context.getResources().getDisplayMetrics().density;
-        return (int) (dipValue * scale + 0.5f);
+
+    public static float dp2px(float dipValue) {
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, App.context.getResources().getDisplayMetrics());
     }
 
-    public static float px2dp( float pxValue) {
-        final float scale = App.context.getResources().getDisplayMetrics().density;
-        return (pxValue / scale + 0.5f);
+    public static float sp2px(float spValue) {
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, spValue, App.context.getResources().getDisplayMetrics());
     }
+
+//    public static int dp2px(float dipValue) {
+//        final float scale = App.context.getResources().getDisplayMetrics().density;
+//        return (int) (dipValue * scale + 0.5f);
+//    }
+//
+//    public static float px2dp( float pxValue) {
+//        final float scale = App.context.getResources().getDisplayMetrics().density;
+//        return (pxValue / scale + 0.5f);
+//    }
 
     /**
      * 获取手机号码
