@@ -241,7 +241,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
                             @Override
                             public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                                Bitmap bm = Blur.fastblur(loadedImage, CommonUtil.dp2px(10), 0.1f);
+                                Bitmap bm = Blur.fastblur(loadedImage, (int) CommonUtil.dp2px(10), 0.1f);
                                 View vBackground = navigationView.getHeaderView(0).findViewById(R.id.vBackground);
                                 vBackground.setBackground(new BitmapDrawable(bm));
                                 ViewHelper.toggleViewAnim(vBackground);
